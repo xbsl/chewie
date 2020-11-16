@@ -52,6 +52,11 @@ class _ChewieDemoState extends State<ChewieDemo> {
       videoPlayerController: _videoPlayerController1,
       autoPlay: true,
       looping: true,
+      enableClosedCaptions: true,
+      closedCaptionUrls: {
+        "English": "",
+        "Hindi": "",
+      }
       // Try playing around with some of these other options:
 
       // showControls: false,

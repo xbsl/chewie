@@ -220,6 +220,8 @@ class ChewieController extends ChangeNotifier {
     this.allowFullScreen = true,
     this.allowMuting = true,
     this.allowPlaybackSpeedChanging = true,
+    this.enableClosedCaptions = false,
+    this.closedCaptionUrls,
     this.playbackSpeeds = const [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
     this.systemOverlaysOnEnterFullScreen,
     this.deviceOrientationsOnEnterFullScreen,
@@ -251,6 +253,12 @@ class ChewieController extends ChangeNotifier {
 
   /// Whether or not to show the controls at all
   final bool showControls;
+
+  /// Whether or not to enable closed captions
+  final bool enableClosedCaptions;
+
+  /// Closed caption URLs and language
+  final Map<String, String> closedCaptionUrls;
 
   /// Defines customised controls. Check [MaterialControls] or
   /// [CupertinoControls] for reference.

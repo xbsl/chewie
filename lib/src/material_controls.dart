@@ -16,7 +16,8 @@ class MaterialControls extends StatefulWidget {
   }
 }
 
-class _MaterialControlsState extends State<MaterialControls> with SingleTickerProviderStateMixin {
+class _MaterialControlsState extends State<MaterialControls>
+    with SingleTickerProviderStateMixin {
   VideoPlayerValue _latestValue;
   double _latestVolume;
   bool _hideStuff = true;
@@ -25,6 +26,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
   Timer _showAfterExpandCollapseTimer;
   bool _dragging = false;
   bool _displayTapped = false;
+  String _selectedCaptionLanguage = "Off";
 
   final barHeight = 48.0;
   final marginSize = 5.0;
@@ -60,7 +62,9 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
           absorbing: _hideStuff,
           child: Column(
             children: <Widget>[
-              if (_latestValue != null && !_latestValue.isPlaying && _latestValue.duration == null ||
+              if (_latestValue != null &&
+                      !_latestValue.isPlaying &&
+                      _latestValue.duration == null ||
                   _latestValue.isBuffering)
                 const Expanded(
                   child: Center(
@@ -124,9 +128,18 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
         child: Row(
           children: <Widget>[
             _buildPlayPause(controller),
-            if (chewieController.isLive) const Expanded(child: Text('LIVE')) else _buildPosition(iconColor),
-            if (chewieController.isLive) const SizedBox() else _buildProgressBar(),
-            if (chewieController.allowPlaybackSpeedChanging) _buildSpeedButton(controller),
+            if (chewieController.isLive)
+              const Expanded(child: Text('LIVE'))
+            else
+              _buildPosition(iconColor),
+            if (chewieController.isLive)
+              const SizedBox()
+            else
+              _buildProgressBar(),
+            if (chewieController.allowPlaybackSpeedChanging)
+              _buildSpeedButton(controller),
+            if (chewieController.enableClosedCaptions)
+              _buildCaptionButton(controller),
             if (chewieController.allowMuting) _buildMuteButton(controller),
             if (chewieController.allowFullScreen) _buildExpandButton(),
           ],
@@ -150,7 +163,9 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
           ),
           child: Center(
             child: Icon(
-              chewieController.isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen,
+              chewieController.isFullScreen
+                  ? Icons.fullscreen_exit
+                  : Icons.fullscreen,
             ),
           ),
         ),
@@ -184,7 +199,10 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
           color: Colors.transparent,
           child: Center(
             child: AnimatedOpacity(
-              opacity: _latestValue != null && !_latestValue.isPlaying && !_dragging ? 1.0 : 0.0,
+              opacity:
+                  _latestValue != null && !_latestValue.isPlaying && !_dragging
+                      ? 1.0
+                      : 0.0,
               duration: const Duration(milliseconds: 300),
               child: GestureDetector(
                 child: Container(
@@ -257,6 +275,53 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
     );
   }
 
+  Widget _buildCaptionButton(
+    VideoPlayerController controller,
+  ) {
+    return GestureDetector(
+      onTap: () async {
+        _hideTimer?.cancel();
+
+        final language = await showModalBottomSheet<String>(
+          context: context,
+          isScrollControlled: true,
+          useRootNavigator: true,
+          builder: (context) => _ClosedCaptionDialog(
+            closedCaptionLanguages: [
+              "Off",
+              ...chewieController.closedCaptionUrls.keys.toList()
+            ],
+            selected: _selectedCaptionLanguage,
+          ),
+        );
+
+        setState(() {
+          _selectedCaptionLanguage = language;
+        });
+
+
+
+        if (_latestValue.isPlaying) {
+          _startHideTimer();
+        }
+      },
+      child: AnimatedOpacity(
+        opacity: _hideStuff ? 0.0 : 1.0,
+        duration: const Duration(milliseconds: 300),
+        child: ClipRect(
+          child: Container(
+            height: barHeight,
+            padding: const EdgeInsets.only(
+              left: 8.0,
+              right: 8.0,
+            ),
+            child: const Icon(Icons.closed_caption),
+          ),
+        ),
+      ),
+    );
+  }
+
   GestureDetector _buildMuteButton(
     VideoPlayerController controller,
   ) {
@@ -282,7 +347,9 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
               right: 8.0,
             ),
             child: Icon(
-              (_latestValue != null && _latestValue.volume > 0) ? Icons.volume_up : Icons.volume_off,
+              (_latestValue != null && _latestValue.volume > 0)
+                  ? Icons.volume_up
+                  : Icons.volume_off,
             ),
           ),
         ),
@@ -309,8 +376,12 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
   }
 
   Widget _buildPosition(Color iconColor) {
-    final position = _latestValue != null && _latestValue.position != null ? _latestValue.position : Duration.zero;
-    final duration = _latestValue != null && _latestValue.duration != null ? _latestValue.duration : Duration.zero;
+    final position = _latestValue != null && _latestValue.position != null
+        ? _latestValue.position
+        : Duration.zero;
+    final duration = _latestValue != null && _latestValue.duration != null
+        ? _latestValue.duration
+        : Duration.zero;
 
     return Padding(
       padding: const EdgeInsets.only(right: 24.0),
@@ -338,7 +409,8 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
 
     _updateState();
 
-    if ((controller.value != null && controller.value.isPlaying) || chewieController.autoPlay) {
+    if ((controller.value != null && controller.value.isPlaying) ||
+        chewieController.autoPlay) {
       _startHideTimer();
     }
 
@@ -356,7 +428,8 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
       _hideStuff = true;
 
       chewieController.toggleFullScreen();
-      _showAfterExpandCollapseTimer = Timer(const Duration(milliseconds: 300), () {
+      _showAfterExpandCollapseTimer =
+          Timer(const Duration(milliseconds: 300), () {
         setState(() {
           _cancelAndRestartTimer();
         });
@@ -439,6 +512,53 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
                   backgroundColor: Theme.of(context).disabledColor),
         ),
       ),
+    );
+  }
+}
+
+class _ClosedCaptionDialog extends StatelessWidget {
+  const _ClosedCaptionDialog(
+      {Key key,
+      @required List<String> closedCaptionLanguages,
+      @required String selected})
+      : _closedCaptionLanguages = closedCaptionLanguages,
+        _selected = selected,
+        super(key: key);
+
+  final List<String> _closedCaptionLanguages;
+  final String _selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color selectedColor = Theme.of(context).primaryColor;
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const ScrollPhysics(),
+      itemBuilder: (context, index) {
+        final _closedCaptionLanguage = _closedCaptionLanguages[index];
+        return ListTile(
+          dense: true,
+          title: Row(
+            children: [
+              if (_closedCaptionLanguage == _selected)
+                Icon(
+                  Icons.check,
+                  size: 20.0,
+                  color: selectedColor,
+                )
+              else
+                Container(width: 20.0),
+              const SizedBox(width: 16.0),
+              Text(_closedCaptionLanguage.toString()),
+            ],
+          ),
+          selected: _closedCaptionLanguage == _selected,
+          onTap: () {
+            Navigator.of(context).pop(_closedCaptionLanguage);
+          },
+        );
+      },
+      itemCount: _closedCaptionLanguages.length,
     );
   }
 }
