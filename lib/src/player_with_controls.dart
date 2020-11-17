@@ -10,6 +10,7 @@ import 'package:video_player/video_player.dart';
 class PlayerWithControls extends StatelessWidget {
   const PlayerWithControls({Key key}) : super(key: key);
 
+
   @override
   Widget build(BuildContext context) {
     final ChewieController chewieController = ChewieController.of(context);
@@ -36,6 +37,7 @@ class PlayerWithControls extends StatelessWidget {
     }
 
     Stack _buildPlayerWithControls(ChewieController chewieController, BuildContext context) {
+
       return Stack(
         children: <Widget>[
           chewieController.placeholder ?? Container(),

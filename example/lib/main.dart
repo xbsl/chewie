@@ -43,7 +43,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
 
   Future<void> initializePlayer() async {
     _videoPlayerController1 = VideoPlayerController.network(
-        'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4');
+        'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4',);
     await _videoPlayerController1.initialize();
     _videoPlayerController2 = VideoPlayerController.network(
         'https://assets.mixkit.co/videos/preview/mixkit-a-girl-blowing-a-bubble-gum-at-an-amusement-park-1226-large.mp4');
@@ -53,9 +53,9 @@ class _ChewieDemoState extends State<ChewieDemo> {
       autoPlay: true,
       looping: true,
       enableClosedCaptions: true,
-      closedCaptionUrls: {
-        "English": "",
-        "Hindi": "",
+      closedCaptionUrls: ["English", "Hindi"],
+      onCaptionLanguageChange: (String captionLanguage) {
+
       }
       // Try playing around with some of these other options:
 

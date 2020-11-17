@@ -289,17 +289,21 @@ class _MaterialControlsState extends State<MaterialControls>
           builder: (context) => _ClosedCaptionDialog(
             closedCaptionLanguages: [
               "Off",
-              ...chewieController.closedCaptionUrls.keys.toList()
+              ...chewieController.closedCaptionUrls
             ],
             selected: _selectedCaptionLanguage,
           ),
         );
 
-        setState(() {
-          _selectedCaptionLanguage = language;
-        });
+        if (language != null) {
+          setState(() {
+            _selectedCaptionLanguage = language;
+          });
+        }
 
-
+        if (chewieController.onCaptionLanguageChange != null) {
+          chewieController.onCaptionLanguageChange(language);
+        }
 
         if (_latestValue.isPlaying) {
           _startHideTimer();
