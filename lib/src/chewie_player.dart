@@ -230,6 +230,7 @@ class ChewieController extends ChangeNotifier {
     this.enableClosedCaptions = false,
     this.closedCaptionUrls,
     this.onCaptionLanguageChange,
+    this.selectedCaptionLanguage = "Off",
     this.playbackSpeeds = const [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
     this.systemOverlaysOnEnterFullScreen,
     this.deviceOrientationsOnEnterFullScreen,
@@ -272,6 +273,9 @@ class ChewieController extends ChangeNotifier {
 
   /// Function to execute when the caption language is changed to load the new captions
   final Function(String) onCaptionLanguageChange;
+
+  // If any default caption language is selected. Default is set to "Off"
+  final String selectedCaptionLanguage;
 
   /// Defines customised controls. Check [MaterialControls] or
   /// [CupertinoControls] for reference.

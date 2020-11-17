@@ -26,7 +26,7 @@ class _MaterialControlsState extends State<MaterialControls>
   Timer _showAfterExpandCollapseTimer;
   bool _dragging = false;
   bool _displayTapped = false;
-  String _selectedCaptionLanguage = "Off";
+  String _selectedCaptionLanguage;
 
   final barHeight = 48.0;
   final marginSize = 5.0;
@@ -99,6 +99,8 @@ class _MaterialControlsState extends State<MaterialControls>
     final _oldController = chewieController;
     chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
+
+    _selectedCaptionLanguage = chewieController.selectedCaptionLanguage;
 
     playPauseIconAnimationController ??= AnimationController(
       vsync: this,
