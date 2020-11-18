@@ -1,15 +1,35 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/cupertino_controls.dart';
 import 'package:chewie/src/material_controls.dart';
+import 'package:chewie/src/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-class PlayerWithControls extends StatelessWidget {
+class PlayerWithControls extends StatefulWidget {
   const PlayerWithControls({Key key}) : super(key: key);
 
+  @override
+  _PlayerWithControlsState createState() => _PlayerWithControlsState();
+}
+
+class _PlayerWithControlsState extends State<PlayerWithControls> {
+
+  String captionLanguage = "Off";
+  StreamSubscription _controller;
+
+  @override
+  void initState() {
+    _controller = Globals.subject.listen((selectedLanguage) {
+      setState(() {
+        captionLanguage = selectedLanguage;
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +48,7 @@ class PlayerWithControls extends StatelessWidget {
       ChewieController chewieController,
     ) {
       final controls = Theme.of(context).platform == TargetPlatform.android
-          ? const MaterialControls()
+          ? MaterialControls(selectedLanguage: captionLanguage,)
           : const CupertinoControls(
               backgroundColor: Color.fromRGBO(41, 41, 41, 0.7),
               iconColor: Color.fromARGB(255, 200, 200, 200),
@@ -68,5 +88,11 @@ class PlayerWithControls extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller?.cancel();
+    super.dispose();
   }
 }

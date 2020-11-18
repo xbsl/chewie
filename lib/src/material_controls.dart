@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class MaterialControls extends StatefulWidget {
-  const MaterialControls({Key key}) : super(key: key);
+  final String selectedLanguage;
+  const MaterialControls({Key key, @required this.selectedLanguage}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -34,15 +35,10 @@ class _MaterialControlsState extends State<MaterialControls>
   VideoPlayerController controller;
   ChewieController chewieController;
   AnimationController playPauseIconAnimationController;
-  StreamSubscription _controller;
 
   @override
   void initState() {
-    _controller = Globals.subject.listen((selectedLanguage) {
-      setState(() {
-        _selectedCaptionLanguage = selectedLanguage;
-      });
-    });
+    _selectedCaptionLanguage = widget.selectedLanguage;
     super.initState();
   }
 
