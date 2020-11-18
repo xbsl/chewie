@@ -34,6 +34,17 @@ class _MaterialControlsState extends State<MaterialControls>
   VideoPlayerController controller;
   ChewieController chewieController;
   AnimationController playPauseIconAnimationController;
+  StreamSubscription _controller;
+
+  @override
+  void initState() {
+    _controller = Globals.subject.listen((selectedLanguage) {
+      setState(() {
+        _selectedCaptionLanguage = selectedLanguage;
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,6 +103,7 @@ class _MaterialControlsState extends State<MaterialControls>
     _hideTimer?.cancel();
     _initTimer?.cancel();
     _showAfterExpandCollapseTimer?.cancel();
+    _controller?.cancel();
   }
 
   @override
