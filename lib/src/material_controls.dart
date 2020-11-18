@@ -99,7 +99,6 @@ class _MaterialControlsState extends State<MaterialControls>
     _hideTimer?.cancel();
     _initTimer?.cancel();
     _showAfterExpandCollapseTimer?.cancel();
-    _controller?.cancel();
   }
 
   @override
