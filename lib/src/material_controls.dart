@@ -304,12 +304,6 @@ class _MaterialControlsState extends State<MaterialControls>
           ),
         );
 
-        if (language != null) {
-          setState(() {
-            _selectedCaptionLanguage = language;
-          });
-        }
-
         if (chewieController.onCaptionLanguageChange != null) {
           chewieController.onCaptionLanguageChange(language);
         }
