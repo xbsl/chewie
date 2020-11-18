@@ -23,13 +23,17 @@ class _PlayerWithControlsState extends State<PlayerWithControls> {
 
   @override
   void initState() {
+    print("--init called inside player with controls");
     _controller = Globals.subject.listen((selectedLanguage) {
+      print("--listener inside player with controls ${selectedLanguage}");
       setState(() {
         captionLanguage = selectedLanguage;
       });
     });
     super.initState();
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -92,6 +96,8 @@ class _PlayerWithControlsState extends State<PlayerWithControls> {
 
   @override
   void dispose() {
+    print("--disposed called inside player with controls");
+
     _controller?.cancel();
     super.dispose();
   }
