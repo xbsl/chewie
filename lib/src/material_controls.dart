@@ -8,8 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class MaterialControls extends StatefulWidget {
-  final String selectedLanguage;
-  const MaterialControls({Key key, @required this.selectedLanguage}) : super(key: key);
+  const MaterialControls(
+      {Key key,
+      @required this.selectedCaptionLanguage,
+      @required this.selectedVideoLanguage})
+      : super(key: key);
+
+  final String selectedCaptionLanguage;
+  final String selectedVideoLanguage;
 
   @override
   State<StatefulWidget> createState() {
@@ -287,21 +293,27 @@ class _MaterialControlsState extends State<MaterialControls>
       onTap: () async {
         _hideTimer?.cancel();
 
-        final language = await showModalBottomSheet<String>(
+        final language = await showModalBottomSheet<Map<String, String>>(
           context: context,
           isScrollControlled: true,
           useRootNavigator: true,
           builder: (context) => _ClosedCaptionDialog(
+            videoLanguages: chewieController.videoLanguageUrls,
             closedCaptionLanguages: [
               "Off",
               ...chewieController.closedCaptionUrls
             ],
-            selected: widget.selectedLanguage,
+            selectedCaptionLanguage: widget.selectedCaptionLanguage,
+            selectedVideoLanguage: widget.selectedVideoLanguage,
           ),
         );
 
-        if (chewieController.onCaptionLanguageChange != null) {
-          chewieController.onCaptionLanguageChange(language);
+        if (language != null) {
+          if (language['videoLanguage'] != null) {
+            chewieController.onVideoLanguageChange(language['videoLanguage']);
+          } else {
+            chewieController.onCaptionLanguageChange(language['captionLanguage']);
+          }
         }
 
         if (_latestValue.isPlaying) {
@@ -523,45 +535,170 @@ class _ClosedCaptionDialog extends StatelessWidget {
   const _ClosedCaptionDialog(
       {Key key,
       @required List<String> closedCaptionLanguages,
-      @required String selected})
+      @required List<String> videoLanguages,
+      @required String selectedVideoLanguage,
+      @required String selectedCaptionLanguage})
       : _closedCaptionLanguages = closedCaptionLanguages,
-        _selected = selected,
+        _videoLanguages = videoLanguages,
+        _selectedCaptionLanguage = selectedCaptionLanguage,
+        _selectedVideoLanguage = selectedVideoLanguage,
         super(key: key);
 
   final List<String> _closedCaptionLanguages;
-  final String _selected;
+  final List<String> _videoLanguages;
+  final String _selectedCaptionLanguage;
+  final String _selectedVideoLanguage;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: _CaptionsData(
+              closedCaptionLanguages: _closedCaptionLanguages,
+              selectedLanguage: _selectedCaptionLanguage,
+            ),
+          ),
+          Expanded(
+            child: _VideoLanguageData(
+              videoLanguages: _videoLanguages,
+              selectedVideoLanguage: _selectedVideoLanguage,
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class _CaptionsData extends StatelessWidget {
+  const _CaptionsData(
+      {Key key,
+      @required List<String> closedCaptionLanguages,
+      @required String selectedLanguage})
+      : _closedCaptionLanguages = closedCaptionLanguages,
+        _selectedLanguage = selectedLanguage,
+        super(key: key);
+
+  final List<String> _closedCaptionLanguages;
+  final String _selectedLanguage;
 
   @override
   Widget build(BuildContext context) {
     final Color selectedColor = Theme.of(context).primaryColor;
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const ScrollPhysics(),
-      itemBuilder: (context, index) {
-        final _closedCaptionLanguage = _closedCaptionLanguages[index];
-        return ListTile(
-          dense: true,
-          title: Row(
-            children: [
-              if (_closedCaptionLanguage == _selected)
-                Icon(
-                  Icons.check,
-                  size: 20.0,
-                  color: selectedColor,
-                )
-              else
-                Container(width: 20.0),
-              const SizedBox(width: 16.0),
-              Text(_closedCaptionLanguage.toString()),
-            ],
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 50),
+          child: Text(
+            'Captions',
+            style: TextStyle(color: selectedColor, fontWeight: FontWeight.bold),
           ),
-          selected: _closedCaptionLanguage == _selected,
-          onTap: () {
-            Navigator.of(context).pop(_closedCaptionLanguage);
+        ),
+        const SizedBox(
+          height: 16,
+        ),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const ScrollPhysics(),
+          itemBuilder: (context, index) {
+            final _closedCaptionLanguage = _closedCaptionLanguages[index];
+            return ListTile(
+              dense: true,
+              title: Row(
+                children: [
+                  if (_closedCaptionLanguage == _selectedLanguage)
+                    Icon(
+                      Icons.check,
+                      size: 20.0,
+                      color: selectedColor,
+                    )
+                  else
+                    Container(width: 20.0),
+                  const SizedBox(width: 16.0),
+                  Text(_closedCaptionLanguage.toString()),
+                ],
+              ),
+              selected: _closedCaptionLanguage == _selectedLanguage,
+              onTap: () {
+                Navigator.of(context)
+                    .pop({"captionLanguage": _closedCaptionLanguage});
+              },
+            );
           },
-        );
-      },
-      itemCount: _closedCaptionLanguages.length,
+          itemCount: _closedCaptionLanguages.length,
+        )
+      ],
+    );
+  }
+}
+
+class _VideoLanguageData extends StatelessWidget {
+  const _VideoLanguageData(
+      {Key key,
+      @required List<String> videoLanguages,
+      @required String selectedVideoLanguage})
+      : _videoLanguages = videoLanguages,
+        _selectedVideoLanguage = selectedVideoLanguage,
+        super(key: key);
+
+  final List<String> _videoLanguages;
+  final String _selectedVideoLanguage;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color selectedColor = Theme.of(context).primaryColor;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 50),
+          child: Text(
+            'Video Language',
+            style: TextStyle(color: selectedColor, fontWeight: FontWeight.bold),
+          ),
+        ),
+        const SizedBox(
+          height: 16,
+        ),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const ScrollPhysics(),
+          itemBuilder: (context, index) {
+            final _videoLanguage = _videoLanguages[index];
+            return ListTile(
+              dense: true,
+              title: Row(
+                children: [
+                  if (_videoLanguage == _selectedVideoLanguage)
+                    Icon(
+                      Icons.check,
+                      size: 20.0,
+                      color: selectedColor,
+                    )
+                  else
+                    Container(width: 20.0),
+                  const SizedBox(width: 16.0),
+                  Text(_videoLanguage.toString()),
+                ],
+              ),
+              selected: _videoLanguage == _selectedVideoLanguage,
+              onTap: () {
+                Navigator.of(context).pop({"videoLanguage": _videoLanguage});
+              },
+            );
+          },
+          itemCount: _videoLanguages.length,
+        )
+      ],
     );
   }
 }

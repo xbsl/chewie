@@ -35,5 +35,6 @@ String formatDuration(Duration position) {
 }
 
 class Globals {
-  static BehaviorSubject<String> subject = BehaviorSubject<String>.seeded("Off");
+  static BehaviorSubject<String> captionSubject = BehaviorSubject<String>.seeded("Off");
+  static BehaviorSubject<String> videoSubject = BehaviorSubject<String>.seeded("English");
 }

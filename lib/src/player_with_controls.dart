@@ -17,23 +17,27 @@ class PlayerWithControls extends StatefulWidget {
 }
 
 class _PlayerWithControlsState extends State<PlayerWithControls> {
-
   String captionLanguage = "Off";
-  StreamSubscription _controller;
+  String videoLanguage = "English";
+  StreamSubscription _captionController;
+  StreamSubscription _videoController;
 
   @override
   void initState() {
-    print("--init called inside player with controls");
-    _controller = Globals.subject.listen((selectedLanguage) {
-      print("--listener inside player with controls ${selectedLanguage}");
+    _captionController = Globals.captionSubject.listen((selectedLanguage) {
       setState(() {
         captionLanguage = selectedLanguage;
       });
     });
+
+    _videoController = Globals.videoSubject.listen((selectedVideoLanguage) {
+      setState(() {
+        videoLanguage = selectedVideoLanguage;
+      });
+    });
+
     super.initState();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -52,22 +56,28 @@ class _PlayerWithControlsState extends State<PlayerWithControls> {
       ChewieController chewieController,
     ) {
       final controls = Theme.of(context).platform == TargetPlatform.android
-          ? MaterialControls(selectedLanguage: captionLanguage,)
+          ? MaterialControls(
+              selectedCaptionLanguage: captionLanguage,
+              selectedVideoLanguage: videoLanguage,
+            )
           : const CupertinoControls(
               backgroundColor: Color.fromRGBO(41, 41, 41, 0.7),
               iconColor: Color.fromARGB(255, 200, 200, 200),
             );
-      return chewieController.showControls ? chewieController.customControls ?? controls : Container();
+      return chewieController.showControls
+          ? chewieController.customControls ?? controls
+          : Container();
     }
 
-    Stack _buildPlayerWithControls(ChewieController chewieController, BuildContext context) {
-
+    Stack _buildPlayerWithControls(
+        ChewieController chewieController, BuildContext context) {
       return Stack(
         children: <Widget>[
           chewieController.placeholder ?? Container(),
           Center(
             child: AspectRatio(
-              aspectRatio: chewieController.aspectRatio ?? chewieController.videoPlayerController.value.aspectRatio,
+              aspectRatio: chewieController.aspectRatio ??
+                  chewieController.videoPlayerController.value.aspectRatio,
               child: VideoPlayer(chewieController.videoPlayerController),
             ),
           ),
@@ -96,9 +106,8 @@ class _PlayerWithControlsState extends State<PlayerWithControls> {
 
   @override
   void dispose() {
-    print("--disposed called inside player with controls");
-
-    _controller?.cancel();
+    _captionController?.cancel();
+    _videoController?.cancel();
     super.dispose();
   }
 }

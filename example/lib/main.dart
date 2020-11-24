@@ -53,6 +53,10 @@ class _ChewieDemoState extends State<ChewieDemo> {
       autoPlay: true,
       looping: true,
       selectedCaptionLanguage: "Off",
+      videoLanguageUrls: ["English", "Hindi"],
+      onVideoLanguageChange: (String language) {
+
+      },
       enableClosedCaptions: true,
       closedCaptionUrls: ["English", "Hindi"],
       onCaptionLanguageChange: (String captionLanguage) {

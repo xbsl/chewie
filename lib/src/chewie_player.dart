@@ -232,6 +232,9 @@ class ChewieController extends ChangeNotifier {
     this.closedCaptionUrls,
     this.onCaptionLanguageChange,
     this.selectedCaptionLanguage = "Off",
+    this.selectedVideoLanguage = "English",
+    this.videoLanguageUrls,
+    this.onVideoLanguageChange,
     this.playbackSpeeds = const [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
     this.systemOverlaysOnEnterFullScreen,
     this.deviceOrientationsOnEnterFullScreen,
@@ -272,11 +275,20 @@ class ChewieController extends ChangeNotifier {
   /// Closed caption URLs and language
   final List<String> closedCaptionUrls;
 
+  /// Video languages list
+  final List<String> videoLanguageUrls;
+
   /// Function to execute when the caption language is changed to load the new captions
   final Function(String) onCaptionLanguageChange;
 
+  /// Function to execute when video language is changed
+  final Function(String) onVideoLanguageChange;
+
   // If any default caption language is selected. Default is set to "Off"
   final String selectedCaptionLanguage;
+
+  /// if any defaul video language is selected. Default is set to "English"
+  final String selectedVideoLanguage;
 
   /// Defines customised controls. Check [MaterialControls] or
   /// [CupertinoControls] for reference.
@@ -428,8 +440,12 @@ class ChewieController extends ChangeNotifier {
     await videoPlayerController.setVolume(volume);
   }
 
-  void setSelectedLanguage(String language) {
-    Globals.subject.add(language);
+  void setSelectedCaptionLanguage(String language) {
+    Globals.captionSubject.add(language);
+  }
+
+  void setSelectedVideoLanguage(String language) {
+    Globals.videoSubject.add(language);
   }
 }
 
